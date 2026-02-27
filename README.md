@@ -1,2 +1,1351 @@
-# Space_ai_project
-Space_ai_project for "Ғылым әлемін ашамыз"
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Explorer – Ғарыш нысандарын зерттеу</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-dark: #020715;
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.2);
+      --accent-2: #06b6d4;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --card: rgba(15, 23, 42, 0.9);
+      --border: rgba(148, 163, 184, 0.3);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 40%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.18) 0, transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(129, 140, 248, 0.18) 0, transparent 55%),
+        radial-gradient(circle at 50% 90%, rgba(45, 212, 191, 0.16) 0, transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    .noise {
+      pointer-events: none;
+      position: fixed;
+      inset: -100px;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1600 900' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+      z-index: -1;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.4));
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f97316, #4f46e5 45%, #020617 100%);
+      box-shadow:
+        0 0 18px rgba(249, 115, 22, 0.6),
+        0 0 40px rgba(79, 70, 229, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon::after {
+      content: "";
+      position: absolute;
+      inset: 22%;
+      border-radius: inherit;
+      border: 2px solid rgba(15, 23, 42, 0.85);
+      box-shadow: inset 0 0 12px rgba(15, 23, 42, 0.95);
+    }
+
+    .logo-text-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    nav a {
+      font-size: 14px;
+      color: var(--muted);
+      margin-left: 18px;
+      text-decoration: none;
+      position: relative;
+      padding-bottom: 4px;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(to right, var(--accent), var(--accent-2));
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+
+    nav a:hover {
+      color: #e5e7eb;
+      transform: translateY(-1px);
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      background: radial-gradient(circle at 10% 0%, rgba(79, 70, 229, 0.9), rgba(17, 24, 39, 0.96));
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow:
+        0 18px 38px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 1);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.2s ease;
+    }
+
+    .btn span {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        0 20px 50px rgba(15, 23, 42, 1),
+        0 0 0 1px rgba(15, 23, 42, 1);
+      background: radial-gradient(circle at 10% 0%, rgba(129, 140, 248, 1), rgba(15, 23, 42, 1));
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 1);
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 30px 18px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 10px 5px 5px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .hero-badge-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #22c55e, #16a34a);
+      box-shadow: 0 0 12px rgba(22, 163, 74, 0.9);
+    }
+
+    .hero-badge span {
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .hero-title {
+      font-size: clamp(34px, 4vw, 42px);
+      line-height: 1.16;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(to right, #e5e7eb, #a5b4fc, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 18px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 22px;
+      margin-bottom: 22px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-meta-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #38bdf8, #4f46e5);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--muted);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.14s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 1);
+      color: #e5e7eb;
+      transform: translateY(-1px);
+    }
+
+    .hero-orbit {
+      position: relative;
+      min-height: 260px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 0%, rgba(129, 140, 248, 0.6), rgba(15, 23, 42, 1));
+      box-shadow: 0 40px 90px rgba(15, 23, 42, 1);
+      overflow: hidden;
+      padding: 18px;
+      border: 1px solid rgba(129, 140, 248, 0.45);
+    }
+
+    .orbit-inner {
+      position: relative;
+      inset: 0;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 20%, #020617, #020617 30%, #020617 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .orbit-ring {
+      position: absolute;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+    }
+
+    .orbit-ring:nth-child(1) {
+      width: 80%;
+      height: 80%;
+    }
+    .orbit-ring:nth-child(2) {
+      width: 62%;
+      height: 62%;
+      border-style: solid;
+      border-color: rgba(96, 165, 250, 0.55);
+    }
+    .orbit-ring:nth-child(3) {
+      width: 44%;
+      height: 44%;
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .planet {
+      width: 92px;
+      height: 92px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 20%, #f97316, #eab308 22%, transparent 45%),
+        radial-gradient(circle at 70% 30%, #4f46e5, #0369a1 40%, #020617 80%);
+      position: relative;
+      box-shadow:
+        0 0 28px rgba(129, 140, 248, 0.9),
+        0 0 80px rgba(59, 130, 246, 0.65);
+    }
+
+    .planet::before {
+      content: "";
+      position: absolute;
+      inset: 26%;
+      border-radius: inherit;
+      border-top: 3px solid rgba(8, 47, 73, 0.85);
+      border-bottom: 3px solid rgba(15, 23, 42, 0.9);
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      transform: rotate(-18deg);
+      box-shadow: 0 0 18px rgba(15, 23, 42, 1);
+    }
+
+    .planet::after {
+      content: "";
+      position: absolute;
+      inset: 10%;
+      border-radius: inherit;
+      border: 1px solid rgba(15, 23, 42, 0.7);
+    }
+
+    .orbit-tag {
+      position: absolute;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 11px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.95);
+    }
+
+    .orbit-tag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(to right, #22c55e, #4ade80);
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.9);
+    }
+
+    .orbit-tag-1 {
+      top: 16%;
+      right: 10%;
+    }
+
+    .orbit-tag-2 {
+      bottom: 14%;
+      left: 8%;
+    }
+
+    .orbit-tag-value {
+      font-size: 11px;
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      font-size: 11px;
+      margin-top: 16px;
+    }
+
+    .metric {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: radial-gradient(circle at 0 0, rgba(79, 70, 229, 0.2), rgba(15, 23, 42, 0.98));
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 9px;
+    }
+
+    .metric-value {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .search-input {
+      position: relative;
+      flex: 1 1 220px;
+    }
+
+    .search-input input {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      padding: 8px 34px 8px 30px;
+      font-size: 13px;
+      outline: none;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.9);
+      transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .search-input input::placeholder {
+      color: rgba(148, 163, 184, 0.9);
+    }
+
+    .search-input input:focus {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 1),
+        0 22px 65px rgba(15, 23, 42, 1);
+      background: radial-gradient(circle at 0% 0%, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.98));
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 13px;
+      color: rgba(148, 163, 184, 0.9);
+    }
+
+    .search-shortcut {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.85);
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      padding: 1px 6px;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .filter-pill {
+      border-radius: 999px;
+      padding: 5px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+      background: rgba(15, 23, 42, 0.9);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.16s ease, border 0.16s ease, color 0.16s ease, transform 0.12s ease;
+    }
+
+    .filter-pill span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #22c55e, #22c55e);
+    }
+
+    .filter-pill.active {
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.98));
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #e5e7eb;
+      transform: translateY(-1px);
+    }
+
+    .filter-pill:hover:not(.active) {
+      border-color: rgba(148, 163, 184, 0.8);
+      color: #e5e7eb;
+    }
+
+    .results-meta {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .object-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .object-card {
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.98));
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border 0.16s ease, background 0.2s ease;
+    }
+
+    .object-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.3), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: -1;
+    }
+
+    .object-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 26px 70px rgba(15, 23, 42, 1);
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 1), rgba(2, 6, 23, 1));
+    }
+
+    .object-card:hover::before {
+      opacity: 1;
+      transform: translate3d(0, 12px, 0);
+    }
+
+    .object-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+
+    .object-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .object-type {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+
+    .object-tag {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--muted);
+    }
+
+    .object-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      min-height: 40px;
+    }
+
+    .object-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 10px;
+    }
+
+    .object-pill {
+      border-radius: 999px;
+      padding: 2px 7px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      color: rgba(209, 213, 219, 0.97);
+    }
+
+    .object-link {
+      margin-top: 10px;
+      font-size: 11px;
+      color: rgba(56, 189, 248, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .object-link span {
+      font-size: 12px;
+      transform: translateY(1px);
+    }
+
+    .resources {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .resource-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.45), rgba(15, 23, 42, 0.98));
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .resource-badge {
+      font-size: 10px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .resource-badge span {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #f97316, #eab308);
+      box-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
+    }
+
+    .resource-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .resource-text {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      max-width: 500px;
+    }
+
+    .resource-list {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .resource-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .resource-item-bullet {
+      margin-top: 3px;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #38bdf8, #4f46e5);
+    }
+
+    .resource-side {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: radial-gradient(circle at 100% 0, rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.98));
+      padding: 12px 14px;
+      box-shadow: var(--shadow-soft);
+      font-size: 12px;
+    }
+
+    .resource-side h3 {
+      font-size: 13px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .resource-grid {
+      display: grid;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .resource-pill {
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.96);
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .resource-pill span.label {
+      color: #e5e7eb;
+    }
+
+    .resource-pill span.value {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 20px 18px 32px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    footer a {
+      color: rgba(148, 163, 184, 0.9);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: rgba(248, 250, 252, 0.95);
+      text-decoration: underline;
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.1fr);
+      }
+      .hero-orbit {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+      .resources {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .object-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav {
+        flex-wrap: wrap;
+      }
+      nav {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      nav a {
+        margin-left: 0;
+        margin-right: 16px;
+      }
+      main {
+        padding-top: 22px;
+      }
+      .hero-title {
+        font-size: 30px;
+      }
+      .object-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="logo-icon"></div>
+        <div>
+          <div class="logo-text-title">Space Explorer</div>
+          <div class="logo-text-sub">Ғарыш нысандарын зерттеу</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#catalog">Каталог</a>
+        <a href="#resources">Дереккөздер</a>
+        <a href="#howto">Қалай жұмыс істейді?</a>
+      </nav>
+      <button class="btn" onclick="scrollToCatalog()">
+        Нысандарды қарау
+        <span>↗</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <div class="hero-badge">
+          <div class="hero-badge-dot"></div>
+          <span>Нақты деректер · NASA / ESA / JPL</span>
+        </div>
+        <h1 class="hero-title">
+          Ғарыштағы нысандарды<br />
+          <span>бір жерден зерттеңіз</span>
+        </h1>
+        <p class="hero-subtitle">
+          Планеталар, галактикалар, тұмандықтар және жасанды спутниктер туралы
+          мәліметтерді жинап, талдау жасап, зерттеу жұмысыңызға ыңғайлы түрде
+          сақтауға арналған көмекші бір парақтық платформа.
+        </p>
+        <div class="hero-meta">
+          <span><div class="hero-meta-bullet"></div> 1000+ астрономиялық нысан үлгісі</span>
+          <span><div class="hero-meta-bullet"></div> Ашық дереккөз сілтемелері</span>
+          <span><div class="hero-meta-bullet"></div> Жаңадан бастаушыларға түсінікті</span>
+        </div>
+        <div class="hero-actions">
+          <button class="btn" onclick="scrollToCatalog()">
+            Каталогты ашу
+            <span>🔭</span>
+          </button>
+          <button class="btn-secondary" onclick="scrollToHowto()">
+            Қалай қолданамын?
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-orbit">
+        <div class="orbit-inner">
+          <div class="orbit-ring"></div>
+          <div class="orbit-ring"></div>
+          <div class="orbit-ring"></div>
+          <div class="planet"></div>
+
+          <div class="orbit-tag orbit-tag-1">
+            <div class="orbit-tag-dot"></div>
+            <div>
+              <div class="orbit-tag-value" id="orbit-object-name">Jupiter</div>
+              <div style="font-size: 10px; color: var(--muted)">Орташа қашықтық · AU</div>
+            </div>
+          </div>
+
+          <div class="orbit-tag orbit-tag-2">
+            <div class="orbit-tag-dot"></div>
+            <div>
+              <div class="orbit-tag-value" id="orbit-object-distance">5.20</div>
+              <div style="font-size: 10px; color: var(--muted)">Орбиталық период · жыл</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Обьектілер</div>
+            <div class="metric-value" id="metric-count">12 үлгі</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Типтер</div>
+            <div class="metric-value" id="metric-types">4 түр</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Дереккөздер</div>
+            <div class="metric-value">NASA · ESA · JPL</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Тіл</div>
+            <div class="metric-value">Қазақша · EN</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalog">
+      <div class="section-title">Ғарыш нысандарының мини-каталогы</div>
+      <div class="section-subtitle">
+        Төмендегі тізім – зерттеуіңізді бастау үшін кішкентай демо-каталог. Сіз кейін
+        мұнда өз нысандарыңызды, сипаттамаларыңызды және сілтемелеріңізді қоса аласыз.
+      </div>
+
+      <div class="search-row">
+        <div class="search-input">
+          <span class="search-icon">🔎</span>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Атауы немесе кілт сөз бойынша іздеу (мысалы, «Jupiter», «галактика», «спутник»)"
+          />
+          <div class="search-shortcut">Enter</div>
+        </div>
+        <button class="btn-secondary" id="resetBtn">Фильтрді тазалау</button>
+      </div>
+
+      <div class="filter-row" id="filterRow">
+        <button class="filter-pill active" data-type="all">
+          <span class="dot"></span> Барлығы
+        </button>
+        <button class="filter-pill" data-type="planet">Планеталар</button>
+        <button class="filter-pill" data-type="galaxy">Галактикалар</button>
+        <button class="filter-pill" data-type="nebula">Тұмандықтар</button>
+        <button class="filter-pill" data-type="satellite">Жасанды спутниктер</button>
+      </div>
+
+      <div class="results-meta" id="resultsMeta"></div>
+
+      <div class="object-grid" id="objectGrid"></div>
+    </section>
+
+    <section id="resources" class="resources">
+      <div class="resource-card">
+        <div class="resource-badge">
+          <span></span>
+          Зерттеуіңізге арналған негізгі бағыттар
+        </div>
+        <div class="resource-title">Қайдан бастауға болады?</div>
+        <p class="resource-text">
+          Бұл лендинг – зерттеуіңіздің «үй беті» ретінде ойластырылған. Мұнда нысандар
+          каталогын, қысқаша сипаттаманы, қашықтық/тип сияқты параметрлерін және
+          ресми мәліметтер базасына сілтемелерді сақтау ыңғайлы.
+        </p>
+        <div class="resource-list">
+          <div class="resource-item">
+            <div class="resource-item-bullet"></div>
+            <div>
+              <strong>1. Нысандарды таңдаңыз.</strong> Зерттегіңіз келетін планеталар,
+              айлар, астероидтар, галактикалар тізімін құрыңыз.
+            </div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-item-bullet"></div>
+            <div>
+              <strong>2. Параметрлерін жазыңыз.</strong> Орбиталық период, массасы,
+              қашықтығы, ашылу жылы, миссиялар т.б.
+            </div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-item-bullet"></div>
+            <div>
+              <strong>3. Дереккөздерді қосыңыз.</strong> NASA Exoplanet Archive,
+              ESA Sky, Hubble / JWST каталогтары, ғылыми мақалалар.
+            </div>
+          </div>
+          <div class="resource-item">
+            <div class="resource-item-bullet"></div>
+            <div>
+              <strong>4. Талдау жасаңыз.</strong> Түрі бойынша салыстыру, орбиталық
+              сипаттамалар, қалыпты емес параметрлерін бөліп көрсету.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-side" id="howto">
+        <h3>Бұл бетті қалай пайдалану керек?</h3>
+        <div class="resource-grid">
+          <div class="resource-pill">
+            <span class="label">1 · HTML файлын жүктеңіз</span>
+            <span class="value">`index.html` ретінде сақтаңыз</span>
+          </div>
+          <div class="resource-pill">
+            <span class="label">2 · Браузерде ашыңыз</span>
+            <span class="value">Chrome, Edge немесе басқа</span>
+          </div>
+          <div class="resource-pill">
+            <span class="label">3 · Нысандар тізімін кеңейтіңіз</span>
+            <span class="value">Кодтағы `objects` массивін толтырыңыз</span>
+          </div>
+          <div class="resource-pill">
+            <span class="label">4 · Жобаңызға бейімдеңіз</span>
+            <span class="value">Тақырып, тіл, логотипті өзгертіңіз</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© <span id="year"></span> Space Explorer · Ғарыш нысандарын зерттеу</div>
+    <div>
+      Дереккөздерге мысал: NASA, ESA, JPL, Hubble, JWST және ашық астрономиялық
+      каталогтар.
+    </div>
+  </footer>
+
+  <script>
+    const objects = [
+      {
+        name: "Jupiter",
+        type: "planet",
+        typeLabel: "Планета",
+        tags: ["Күн жүйесі", "Газ алыбы"],
+        description:
+          "Күн жүйесіндегі ең үлкен планета. Қалың атмосферасы, алып Қызыл дағы және ондаған серіктері бар.",
+        distance: "5.20 AU",
+        period: "11.86 жыл",
+        source: "https://solarsystem.nasa.gov/planets/jupiter/overview/",
+        quick: ["Масса: 1.898 × 10^27 кг", "Серіктері: 90+", "Орбитаішілік жылдамдық: 13.1 км/с"],
+      },
+      {
+        name: "Saturn",
+        type: "planet",
+        typeLabel: "Планета",
+        tags: ["Күн жүйесі", "Сақиналар"],
+        description:
+          "Аса айқын сақина жүйесі бар газ алыбы. 80-нен астам белгілі серікке ие.",
+        distance: "9.58 AU",
+        period: "29.46 жыл",
+        source: "https://solarsystem.nasa.gov/planets/saturn/overview/",
+        quick: ["Сақиналар: мұз және жыныстар", "Масса: 5.683 × 10^26 кг"],
+      },
+      {
+        name: "Andromeda Galaxy (M31)",
+        type: "galaxy",
+        typeLabel: "Галактика",
+        tags: ["Спираль галактика", "Жергілікті топ"],
+        description:
+          "Құс жолына ең жақын алып спираль галактика. Болашақта біздің галактикамен соқтығысуы мүмкін.",
+        distance: "2.54 млн жарық жылы",
+        period: "—",
+        source: "https://esahubble.org/wordbank/andromeda-galaxy/",
+        quick: ["Диаметрі ≈ 220 000 ж.ж.", "Жұлдыздар: шамамен бір триллион"],
+      },
+      {
+        name: "Orion Nebula (M42)",
+        type: "nebula",
+        typeLabel: "Тұмандық",
+        tags: ["Жұлдыз түзілуі", "Эмиссиялық тұмандық"],
+        description:
+          "Жалаң көзбен көрінетін, жаңа жұлдыздар қалыптасып жатқан ең жақын алып тұмандықтардың бірі.",
+        distance: "~1344 жарық жылы",
+        period: "—",
+        source: "https://hubblesite.org/contents/news-releases/2006/news-2006-01.html",
+        quick: ["Жұлдыздардың белсенді түзілу аймағы", "Құс жолының Орион қолында орналасқан"],
+      },
+      {
+        name: "International Space Station (ISS)",
+        type: "satellite",
+        typeLabel: "Жасанды спутник",
+        tags: ["Орбиталық станция", "Бірлескен миссия"],
+        description:
+          "Төмен Жер орбитасындағы көпұлтты ғарыш станциясы, ғылыми зерттеулер жүргізуге арналған платформа.",
+        distance: "~408 км (Жерден)",
+        period: "~92 минут",
+        source: "https://www.nasa.gov/mission_pages/station/main/index.html",
+        quick: ["Экипаж: 3–10 адам", "Орбита жылдамдығы: ~7.66 км/с"],
+      },
+      {
+        name: "Hubble Space Telescope",
+        type: "satellite",
+        typeLabel: "Ғарыш телескопы",
+        tags: ["Бақылау", "Оптикалық телескоп"],
+        description:
+          "1990 жылдан бері ғаламның терең суреттерін түсіріп келе жатқан әйгілі ғарыш телескопы.",
+        distance: "~540 км (орбита биіктігі)",
+        period: "~95 минут",
+        source: "https://www.nasa.gov/mission_pages/hubble/story/index.html",
+        quick: ["Айна диаметрі: 2.4 м", "Толқын ұзындығы: ультракүлгін – жақын ИҚ"],
+      },
+      {
+        name: "JWST (James Webb Space Telescope)",
+        type: "satellite",
+        typeLabel: "Ғарыш телескопы",
+        tags: ["Инфрақызыл", "L2 нүктесі"],
+        description:
+          "Әлемнің алғашқы галактикаларын, жұлдыз түзілуін және экзопланеталар атмосферасын зерттейтін NASA/ESA/CSA телескопы.",
+        distance: "≈1.5 млн км (L2)",
+        period: "—",
+        source: "https://webb.nasa.gov/content/webbLaunch/whereIsWebb.html",
+        quick: ["Айна диаметрі: 6.5 м", "Толқын ұзындығы: 0.6–28 микрон"],
+      },
+      {
+        name: "Mars",
+        type: "planet",
+        typeLabel: "Планета",
+        tags: ["Қызыл планета", "Зымыран миссиялары"],
+        description:
+          "Жерге ұқсас, бірақ жұқа атмосферасы бар тасты планета. Curiosity, Perseverance секілді ровелер жұмыс істеп тұр.",
+        distance: "1.52 AU",
+        period: "1.88 жыл",
+        source: "https://solarsystem.nasa.gov/planets/mars/overview/",
+        quick: ["Спутниктері: Фобос, Деймос", "Болашақ адам миссиялары үшін мақсат"],
+      },
+      {
+        name: "Milky Way",
+        type: "galaxy",
+        typeLabel: "Галактика",
+        tags: ["Біздің галактика", "Спираль"],
+        description:
+          "Күн жүйесі орналасқан барлы спираль галактика. Андромедамен бірге Жергілікті топтың бөлігі.",
+        distance: "— (ішіндегі бақылаушы)",
+        period: "Орбита: ~230 млн жыл (Күн)",
+        source: "https://esahubble.org/science/milky_way/",
+        quick: ["Диаметрі ≈ 100 000 ж.ж.", "Жұлдыздар: 100–400 млрд"],
+      },
+      {
+        name: "Crab Nebula (M1)",
+        type: "nebula",
+        typeLabel: "Қалдық тұмандық",
+        tags: ["Супернова қалдығы", "Пульсар"],
+        description:
+          "1054 жылы байқалған супернова жарылысының қалдығы. Ішінде нейтрон жұлдызы – Қызылша пульсары бар.",
+        distance: "~6500 жарық жылы",
+        period: "Пульсар период: 33 мс",
+        source: "https://hubblesite.org/contents/news-releases/2008/news-2008-24.html",
+        quick: ["Толқын спектрі кең", "Жарқын синхротрон радиациясы"],
+      },
+      {
+        name: "Voyager 1",
+        type: "satellite",
+        typeLabel: "Ғарыш зонды",
+        tags: ["Жұлдызарлық кеңістік", "Ұзақмерзімді миссия"],
+        description:
+          "1977 жылы ұшырылған, қазір жұлдызаралық кеңістікте ұшып жүрген ең алыс адам жасаған аппарат.",
+        distance: ">23 млрд км",
+        period: "—",
+        source: "https://voyager.jpl.nasa.gov/",
+        quick: ["Алтын пластинка жазбасы бар", "Плазма толқындарын өлшейді"],
+      },
+      {
+        name: "Kepler-452b",
+        type: "planet",
+        typeLabel: "Экзопланета",
+        tags: ["Экзопланета", "Қоныстануға ұқсас"],
+        description:
+          "Күнге ұқсас жұлдызды айналып өтетін, «Жердің үлкен ағасы» деп аталған ықтимал тіршілікке қолайлы аймақтағы экзопланета.",
+        distance: "~1400 жарық жылы",
+        period: "385 күн",
+        source: "https://www.nasa.gov/mission_pages/kepler/news/kepler-452b.html",
+        quick: ["Сәулелену Жерден 10% жоғары", "Радиусы Жерден ≈60% үлкен"],
+      },
+      {
+        name: "TRAPPIST-1e",
+        type: "planet",
+        typeLabel: "Экзопланета",
+        tags: ["Көппланеталық жүйе", "Тіршілік аймағы"],
+        description:
+          "Жеті Жер өлшемдес планетасы бар TRAPPIST-1 жүйесіндегі ықтимал тіршілік аймағындағы планета.",
+        distance: "~39 жарық жылы",
+        period: "6.1 күн",
+        source: "https://www.nasa.gov/planetary/trappist-1/",
+        quick: ["Жұлдызы – ультрасалқын қызыл ергежейлі", "Жерге ұқсас тығыздық"],
+      },
+    ];
+
+    const orbitVariants = [
+      {
+        name: "Jupiter",
+        distance: "5.20",
+        period: "11.86",
+      },
+      {
+        name: "Saturn",
+        distance: "9.58",
+        period: "29.46",
+      },
+      {
+        name: "Mars",
+        distance: "1.52",
+        period: "1.88",
+      },
+    ];
+
+    const objectGrid = document.getElementById("objectGrid");
+    const searchInput = document.getElementById("searchInput");
+    const filterRow = document.getElementById("filterRow");
+    const resultsMeta = document.getElementById("resultsMeta");
+    const resetBtn = document.getElementById("resetBtn");
+    const orbitObjectName = document.getElementById("orbit-object-name");
+    const orbitObjectDistance = document.getElementById("orbit-object-distance");
+    const metricCount = document.getElementById("metric-count");
+    const metricTypes = document.getElementById("metric-types");
+
+    function renderObjects(list) {
+      objectGrid.innerHTML = "";
+      list.forEach((obj) => {
+        const el = document.createElement("article");
+        el.className = "object-card";
+        el.innerHTML = `
+          <div class="object-header">
+            <div>
+              <div class="object-name">${obj.name}</div>
+              <div class="object-type">${obj.typeLabel}</div>
+            </div>
+            <div class="object-tag">${obj.distance}</div>
+          </div>
+          <p class="object-desc">${obj.description}</p>
+          <div class="object-meta">
+            ${obj.quick
+              .slice(0, 3)
+              .map((item) => `<span class="object-pill">${item}</span>`)
+              .join("")}
+          </div>
+          <a class="object-link" href="${obj.source}" target="_blank" rel="noopener noreferrer">
+            Ресми дереккөзге өту <span>↗</span>
+          </a>
+        `;
+        objectGrid.appendChild(el);
+      });
+
+      const types = new Set(list.map((o) => o.type));
+      metricCount.textContent = list.length + " үлгі";
+      metricTypes.textContent = types.size + " түр";
+    }
+
+    function getActiveType() {
+      const active = filterRow.querySelector(".filter-pill.active");
+      return active ? active.dataset.type : "all";
+    }
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      const type = getActiveType();
+
+      const filtered = objects.filter((obj) => {
+        const matchType = type === "all" || obj.type === type;
+        const text =
+          (obj.name + " " + obj.typeLabel + " " + obj.description + " " + obj.tags.join(" ")).toLowerCase();
+        const matchQuery = !query || text.includes(query);
+        return matchType && matchQuery;
+      });
+
+      renderObjects(filtered);
+
+      resultsMeta.textContent =
+        filtered.length > 0
+          ? `${filtered.length} нысан табылды`
+          : "Нысан табылмады. Басқа кілт сөзбен көріңіз немесе фильтрді алыңыз.";
+    }
+
+    filterRow.addEventListener("click", (event) => {
+      const pill = event.target.closest(".filter-pill");
+      if (!pill) return;
+      filterRow.querySelectorAll(".filter-pill").forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+      applyFilters();
+    });
+
+    searchInput.addEventListener("input", () => {
+      applyFilters();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      filterRow.querySelectorAll(".filter-pill").forEach((p) => p.classList.remove("active"));
+      const allPill = filterRow.querySelector('[data-type="all"]');
+      if (allPill) allPill.classList.add("active");
+      applyFilters();
+    });
+
+    function scrollToCatalog() {
+      document.getElementById("catalog").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function scrollToHowto() {
+      document.getElementById("howto").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function cycleOrbit() {
+      const variant = orbitVariants[Math.floor(Math.random() * orbitVariants.length)];
+      if (orbitObjectName && orbitObjectDistance) {
+        orbitObjectName.textContent = variant.name;
+        orbitObjectDistance.textContent = variant.distance;
+      }
+    }
+
+    setInterval(cycleOrbit, 5000);
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    applyFilters();
+  </script>
+</body>
+</html>
